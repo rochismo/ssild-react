@@ -6,20 +6,25 @@ import { MAX_SENSE_SECONDS, MIN_SENSE_SECONDS } from '@/constants/SSILD_CONSTANT
 import { SSILDConfig } from '@/types/SSILDConfig'
 import { Path } from '@/types/utils'
 import { determineMaximumValue } from '@/utils/math'
+import { readDeepValue, setDeepValue } from '@/hooks/useForm'
 
 export const SensesDurationConfiguration = () => {
   const { form, isRunning } = useSSILDContext()
 
   const changeSenseDuration = (key: Path<SSILDConfig>, values: number[]) => {
     const [value] = values
-    form.changeValue(key, value)
-
     const reminderValueKey = key.replace('cycleTimes', 'reminderTimes') as Path<SSILDConfig>
-    const reminderValue = form.readValue(reminderValueKey) as number
+    form.changeValue(key, (prev) => {
+      const newForm = structuredClone(prev)
+      setDeepValue(newForm, key, value)
 
-    if (reminderValue > value) {
-      form.changeValue(reminderValueKey, determineMaximumValue(value))
-    }
+      const reminderValue = readDeepValue(prev, reminderValueKey) as number
+      if (reminderValue > value) {
+        setDeepValue(newForm, reminderValueKey, determineMaximumValue(value))
+      }
+
+      return newForm
+    })
   }
 
   return (

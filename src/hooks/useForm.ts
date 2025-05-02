@@ -2,7 +2,7 @@
 import { Path, PathValue } from '@/types/utils'
 import { useCallback, useState } from 'react'
 
-function setDeepValue<T>(obj: T, path: string, value: any): T {
+export function setDeepValue<T>(obj: T, path: string, value: any): T {
   const keys = path.split('.')
   const lastKey = keys.pop()!
   const target = keys.reduce((acc: any, key) => {
@@ -14,7 +14,7 @@ function setDeepValue<T>(obj: T, path: string, value: any): T {
   return { ...obj }
 }
 
-function readDeepValue<T, K extends Path<T>>(obj: T, path: K): PathValue<T, K> {
+export function readDeepValue<T, K extends Path<T>>(obj: T, path: K): PathValue<T, K> {
   const keys = path.split('.')
   let current: any = obj
 
@@ -28,8 +28,12 @@ function readDeepValue<T, K extends Path<T>>(obj: T, path: K): PathValue<T, K> {
 export const useForm = <T>(initialValue: T, defaultValues: T) => {
   const [form, setForm] = useState(initialValue)
 
-  const changeValue = useCallback(<K extends Path<T>>(key: K, value: PathValue<T, K>) => {
-    setForm((prev) => setDeepValue(structuredClone(prev), key, value))
+  const changeValue = useCallback(<K extends Path<T>>(key: K, value: PathValue<T, K> | ((prev: T) => T)) => {
+    if (typeof value === 'function') {
+      setForm((prev) => (value as (prev: T) => T)(prev))
+    } else {
+      setForm((prev) => setDeepValue({ ...prev }, key, value))
+    }
   }, [])
 
   const readValue = useCallback(
