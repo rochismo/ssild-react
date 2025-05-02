@@ -44,7 +44,6 @@ export const useSSILDLogic = (form: ReturnType<typeof useForm<SSILDConfig>>) => 
     // It must not be executed unless the status was IDLE
     if (statusRef.current !== SSILDStatus.IDLE) return
     const config = form.values
-    console.log(config)
     do {
       for (let cycleNumber = 0; cycleNumber < config.numberOfCycles; cycleNumber++) {
         // Give a few seconds of grace for each cycle

@@ -16,13 +16,7 @@ export const SensesDurationConfiguration = () => {
 
     const reminderValueKey = key.replace('cycleTimes', 'reminderTimes') as Path<SSILDConfig>
     const reminderValue = form.readValue(reminderValueKey) as number
-    console.log({
-      reminderValueKey,
-      reminderValue,
-      value,
-      shouldChange: reminderValue > value,
-      nextValue: determineMaximumValue(value),
-    })
+
     if (reminderValue > value) {
       form.changeValue(reminderValueKey, determineMaximumValue(value))
     }

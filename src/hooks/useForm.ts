@@ -29,7 +29,7 @@ export const useForm = <T>(initialValue: T, defaultValues: T) => {
   const [form, setForm] = useState(initialValue)
 
   const changeValue = useCallback(<K extends Path<T>>(key: K, value: PathValue<T, K>) => {
-    setForm((prev) => setDeepValue({ ...prev }, key, value))
+    setForm((prev) => setDeepValue(structuredClone(prev), key, value))
   }, [])
 
   const readValue = useCallback(
