@@ -91,7 +91,7 @@ function App() {
             </Button>
 
             {status === SSILDStatus.IDLE && (
-              <Button size="md" onClick={form.reset}>
+              <Button size="md" onClick={() => form.reset()}>
                 Reset Settings
               </Button>
             )}

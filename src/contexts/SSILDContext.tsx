@@ -49,7 +49,7 @@ export const SSILDContextProvider = ({ children }: PropsWithChildren) => {
 
   useEffect(() => {
     saveConfig(form.values)
-  }, [form.values, saveConfig])
+  }, [form, saveConfig])
 
   return (
     <SSILDContext.Provider
