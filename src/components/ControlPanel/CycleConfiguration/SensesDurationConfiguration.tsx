@@ -8,7 +8,7 @@ import { Path } from '@/types/utils'
 import { determineMaximumValue } from '@/utils/math'
 
 export const SensesDurationConfiguration = () => {
-  const { form } = useSSILDContext()
+  const { form, isRunning } = useSSILDContext()
 
   const changeSenseDuration = (key: Path<SSILDConfig>, values: number[]) => {
     const [value] = values
@@ -28,6 +28,7 @@ export const SensesDurationConfiguration = () => {
         value={[form.values.cycleTimes.sight]}
         max={MAX_SENSE_SECONDS}
         min={MIN_SENSE_SECONDS}
+        disabled={isRunning}
         onValueChange={({ value }) => changeSenseDuration('cycleTimes.sight', value)}
       >
         <Slider.Label>Sight Focus Duration (sec)</Slider.Label>
@@ -51,6 +52,7 @@ export const SensesDurationConfiguration = () => {
         value={[form.values.cycleTimes.hearing]}
         max={MAX_SENSE_SECONDS}
         min={MIN_SENSE_SECONDS}
+        disabled={isRunning}
         onValueChange={({ value }) => changeSenseDuration('cycleTimes.hearing', value)}
       >
         <Slider.Label>Hearing Focus Duration (sec)</Slider.Label>
@@ -74,6 +76,7 @@ export const SensesDurationConfiguration = () => {
         value={[form.values.cycleTimes.touch]}
         max={MAX_SENSE_SECONDS}
         min={MIN_SENSE_SECONDS}
+        disabled={isRunning}
         onValueChange={({ value }) => changeSenseDuration('cycleTimes.touch', value)}
       >
         <Slider.Label>Touch Focus Duration (sec)</Slider.Label>

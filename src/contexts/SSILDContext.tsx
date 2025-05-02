@@ -11,6 +11,7 @@ type SSILDContextValue = {
   start: () => void
   pause: () => void
   stop: () => void
+  isRunning: boolean
   status: SSILDStatus
 }
 
@@ -37,6 +38,7 @@ export const SSILDContextProvider = ({ children }: PropsWithChildren) => {
   const form = useForm<SSILDConfig>(config, defaultValues)
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([])
   const ssildLogic = useSSILDLogic(form)
+  const isRunning = ssildLogic.status !== SSILDStatus.IDLE
 
   useEffect(() => {
     speechSynthesis.onvoiceschanged = () => {
@@ -55,6 +57,7 @@ export const SSILDContextProvider = ({ children }: PropsWithChildren) => {
         form,
         voices,
         ...ssildLogic,
+        isRunning,
       }}
     >
       {children}

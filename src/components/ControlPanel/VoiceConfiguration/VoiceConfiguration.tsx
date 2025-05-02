@@ -5,7 +5,7 @@ import { useCallback, useMemo } from 'react'
 import { MdPlayArrow } from 'react-icons/md'
 
 export const VoiceConfiguration = () => {
-  const { form, voices } = useSSILDContext()
+  const { form, voices, isRunning } = useSSILDContext()
 
   const collection = useMemo(() => {
     return createListCollection({ items: voices, itemToString: (item) => item.name, itemToValue: (item) => item.name })
@@ -22,6 +22,7 @@ export const VoiceConfiguration = () => {
         collection={collection}
         width="320px"
         value={[form.values.voice]}
+        disabled={isRunning}
         onValueChange={(e) => form.changeValue('voice', e.value[0])}
       >
         <Select.HiddenSelect />
@@ -48,7 +49,7 @@ export const VoiceConfiguration = () => {
         </Portal>
       </Select.Root>
 
-      <Button onClick={playSample}>
+      <Button onClick={playSample} disabled={isRunning}>
         <MdPlayArrow /> Play Sample
       </Button>
     </Flex>

@@ -5,13 +5,14 @@ import { ImEye } from 'react-icons/im'
 import { MdHearing, MdTouchApp } from 'react-icons/md'
 
 export const CycleReminderConfiguration = () => {
-  const { form } = useSSILDContext()
+  const { form, isRunning } = useSSILDContext()
   return (
     <Flex justifyContent={'space-between'} direction={'column'} gap="3">
       <Slider.Root
         value={[form.values.reminderTimes.sight]}
         max={determineMaximumValue(form.values.cycleTimes.sight)}
         min={0}
+        disabled={isRunning}
         onValueChange={({ value }) => form.changeValue('reminderTimes.sight', value[0])}
       >
         <Slider.Label>Eye Focus Reminder (sec)</Slider.Label>
@@ -35,6 +36,7 @@ export const CycleReminderConfiguration = () => {
         value={[form.values.reminderTimes.hearing]}
         max={determineMaximumValue(form.values.cycleTimes.hearing)}
         min={0}
+        disabled={isRunning}
         onValueChange={({ value }) => form.changeValue('reminderTimes.hearing', value[0])}
       >
         <Slider.Label>Hearing Focus Reminder (sec)</Slider.Label>
@@ -58,6 +60,7 @@ export const CycleReminderConfiguration = () => {
         value={[form.values.reminderTimes.touch]}
         max={determineMaximumValue(form.values.cycleTimes.touch)}
         min={0}
+        disabled={isRunning}
         onValueChange={({ value }) => form.changeValue('reminderTimes.touch', value[0])}
       >
         <Slider.Label>Touch Focus Reminder (sec)</Slider.Label>
