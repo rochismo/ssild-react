@@ -8,9 +8,10 @@ export default defineConfig({
   server: {
     host: true,
   },
+  base: '/ssild-react',
   resolve: {
-      alias: {
-        '@': fileURLToPath(new URL('./src', import.meta.url))
-      }
-    }
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
 })
