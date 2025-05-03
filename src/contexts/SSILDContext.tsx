@@ -2,7 +2,11 @@ import { useForm } from '@/hooks/useForm'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { SSILDConfig, SSILDStatus } from '@/types/SSILDConfig'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
-import { DEFAULT_CYCLE_TIME_SECONDS, DEFAULT_CYCLE_REMINDER_SECONDS } from '@/constants/SSILD_CONSTANTS'
+import {
+  DEFAULT_CYCLE_TIME_SECONDS,
+  DEFAULT_CYCLE_REMINDER_SECONDS,
+  DEFAULT_START_DELAY,
+} from '@/constants/SSILD_CONSTANTS'
 import { useSSILDLogic } from '@/hooks/useSSILDLogic'
 
 type SSILDContextValue = {
@@ -31,6 +35,7 @@ const defaultValues: SSILDConfig = {
     touch: DEFAULT_CYCLE_REMINDER_SECONDS,
   },
   voice: '',
+  startDelay: DEFAULT_START_DELAY,
 }
 
 export const SSILDContextProvider = ({ children }: PropsWithChildren) => {

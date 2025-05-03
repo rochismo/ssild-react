@@ -10,6 +10,7 @@ const senses = ['sight', 'hearing', 'touch']
 export const useSSILDLogic = (form: ReturnType<typeof useForm<SSILDConfig>>) => {
   const [status, setStatus] = useState(SSILDStatus.IDLE)
   const statusRef = useRef(status)
+  const abortControllerRef = useRef<AbortController>(undefined)
 
   useEffect(() => {
     statusRef.current = status
@@ -38,17 +39,34 @@ export const useSSILDLogic = (form: ReturnType<typeof useForm<SSILDConfig>>) => 
   )
 
   const start = useCallback(async () => {
-    setStatus(SSILDStatus.RUNNING)
-
+    if (abortControllerRef.current != null) {
+      abortControllerRef.current.abort()
+    }
     // This function gets called upon resuming SSILD.
     // It must not be executed unless the status was IDLE
-    if (statusRef.current !== SSILDStatus.IDLE) return
+    if (!isStopped()) return
+
     const config = form.values
+    if (config.startDelay !== 0) {
+      setStatus(SSILDStatus.STARTING)
+
+      const controller = new AbortController()
+      abortControllerRef.current = controller
+
+      try {
+        await sleep(config.startDelay, abortControllerRef.current.signal)
+      } catch {
+        return
+      }
+    }
+
+    if (isStopped()) {
+      return
+    }
+
+    setStatus(SSILDStatus.RUNNING)
     do {
       for (let cycleNumber = 0; cycleNumber < config.numberOfCycles; cycleNumber++) {
-        // Give a few seconds of grace for each cycle
-        await waitWithPause(2)
-
         if (isStopped()) return
 
         for (const sense of senses) {

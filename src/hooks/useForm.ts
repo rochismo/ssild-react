@@ -32,7 +32,7 @@ export const useForm = <T>(initialValue: T, defaultValues: T) => {
     if (typeof value === 'function') {
       setForm((prev) => (value as (prev: T) => T)(prev))
     } else {
-      setForm((prev) => setDeepValue({ ...prev }, key, value))
+      setForm((prev) => setDeepValue(prev, key, value))
     }
   }, [])
 
