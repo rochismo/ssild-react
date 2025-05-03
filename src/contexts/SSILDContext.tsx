@@ -45,6 +45,7 @@ export const SSILDContextProvider = ({ children }: PropsWithChildren) => {
       const voices = speechSynthesis.getVoices()
       setVoices(voices)
     }
+    speechSynthesis.getVoices()
   }, [])
 
   useEffect(() => {
