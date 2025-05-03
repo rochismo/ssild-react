@@ -1,3 +1,13 @@
+import { backgroundNoises } from '@/definitions/background-noise.definitions'
+import { Flex } from '@chakra-ui/react'
+import { BackgroundNoiseElement } from './BackgroundNoiseElement'
+
 export const BackgroundNoiseContainer = () => {
-  return <p>Le background noise contrainer</p>
+  return (
+    <Flex wrap={'wrap'} gap="10" overflowY="auto" height="100%" justifyContent={'center'} py={5}>
+      {backgroundNoises.map((sound) => {
+        return <BackgroundNoiseElement sound={sound} />
+      })}
+    </Flex>
+  )
 }
