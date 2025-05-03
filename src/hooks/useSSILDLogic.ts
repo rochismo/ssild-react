@@ -58,13 +58,14 @@ export const useSSILDLogic = (form: ReturnType<typeof useForm<SSILDConfig>>) => 
       } catch {
         return
       }
-    }
 
-    if (isStopped()) {
-      return
+      if (isStopped()) {
+        return
+      }
     }
 
     setStatus(SSILDStatus.RUNNING)
+    statusRef.current = SSILDStatus.RUNNING
     do {
       for (let cycleNumber = 0; cycleNumber < config.numberOfCycles; cycleNumber++) {
         if (isStopped()) return
@@ -100,10 +101,12 @@ export const useSSILDLogic = (form: ReturnType<typeof useForm<SSILDConfig>>) => 
 
   const pause = useCallback(() => {
     setStatus(SSILDStatus.PAUSED)
+    statusRef.current = SSILDStatus.PAUSED
   }, [])
 
   const stop = useCallback(() => {
     setStatus(SSILDStatus.IDLE)
+    statusRef.current = SSILDStatus.IDLE
   }, [])
 
   return { start, pause, stop, status }

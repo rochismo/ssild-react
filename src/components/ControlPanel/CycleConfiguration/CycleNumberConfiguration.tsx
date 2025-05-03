@@ -10,10 +10,12 @@ export const CycleNumberConfiguration = () => {
         <NumberInput.Root
           disabled={form.values.unlimited || isRunning}
           value={`${form.values.numberOfCycles}`}
+          min={MIN_CYCLES}
+          max={MAX_CYCLES}
           onValueChange={({ valueAsNumber: value }) => form.changeValue('numberOfCycles', value || 0)}
         >
           <NumberInput.Label>Number of Cycles</NumberInput.Label>
-          <NumberInput.Input min={MIN_CYCLES} max={MAX_CYCLES}></NumberInput.Input>
+          <NumberInput.Input></NumberInput.Input>
         </NumberInput.Root>
 
         <Checkbox.Root
@@ -29,10 +31,12 @@ export const CycleNumberConfiguration = () => {
       <NumberInput.Root
         disabled={isRunning}
         value={`${form.values.startDelay}`}
+        min={DEFAULT_START_DELAY}
+        max={MAX_START_DELAY}
         onValueChange={({ valueAsNumber: value }) => form.changeValue('startDelay', value || 0)}
       >
         <NumberInput.Label>Delay Start (sec)</NumberInput.Label>
-        <NumberInput.Input min={DEFAULT_START_DELAY} max={MAX_START_DELAY}></NumberInput.Input>
+        <NumberInput.Input></NumberInput.Input>
       </NumberInput.Root>
     </Flex>
   )

@@ -1,6 +1,7 @@
 export const DEFAULT_CYCLE_TIME_SECONDS = 30
 export const DEFAULT_CYCLE_REMINDER_SECONDS = 0
-export const MIN_CYCLES = 3
+export const DEFAULT_MAX_CYCLES = 3
+export const MIN_CYCLES = 1
 export const MAX_CYCLES = 100
 export const MIN_SENSE_SECONDS = 5
 export const MAX_SENSE_SECONDS = 100

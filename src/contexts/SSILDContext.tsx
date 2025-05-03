@@ -6,6 +6,7 @@ import {
   DEFAULT_CYCLE_TIME_SECONDS,
   DEFAULT_CYCLE_REMINDER_SECONDS,
   DEFAULT_START_DELAY,
+  DEFAULT_MAX_CYCLES,
 } from '@/constants/SSILD_CONSTANTS'
 import { useSSILDLogic } from '@/hooks/useSSILDLogic'
 
@@ -27,7 +28,7 @@ const defaultValues: SSILDConfig = {
     sight: DEFAULT_CYCLE_TIME_SECONDS,
     touch: DEFAULT_CYCLE_TIME_SECONDS,
   },
-  numberOfCycles: 3,
+  numberOfCycles: DEFAULT_MAX_CYCLES,
   unlimited: false,
   reminderTimes: {
     hearing: DEFAULT_CYCLE_REMINDER_SECONDS,
