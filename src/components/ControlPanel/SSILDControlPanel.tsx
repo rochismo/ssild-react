@@ -1,4 +1,3 @@
-import { Separator } from '@chakra-ui/react'
 import { SSILDSeparator } from '../ui/SSILDSeparator'
 import { ControlPanelTabs } from './ControlPanelTabs'
 import { CycleNumberConfiguration } from './CycleConfiguration/CycleNumberConfiguration'
@@ -16,8 +15,6 @@ export const SSILDControlPanel = () => {
       <SSILDSeparator text="Voice Configuration" />
 
       <VoiceConfiguration />
-
-      <Separator flex="1" mt="5" mb="5" />
     </>
   )
 }
