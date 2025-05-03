@@ -8,7 +8,11 @@ export const VoiceConfiguration = () => {
   const { form, voices, isRunning } = useSSILDContext()
 
   const collection = useMemo(() => {
-    return createListCollection({ items: voices, itemToString: (item) => item.name, itemToValue: (item) => item.name })
+    return createListCollection({
+      items: voices,
+      itemToString: (item) => item.name,
+      itemToValue: (item) => item.voiceURI,
+    })
   }, [voices])
 
   const playSample = useCallback(() => {
