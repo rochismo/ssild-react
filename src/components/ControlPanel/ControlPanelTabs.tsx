@@ -1,4 +1,4 @@
-import { Tabs } from '@chakra-ui/react'
+import { Box, Tabs } from '@chakra-ui/react'
 import { CycleConfiguration } from './CycleConfiguration'
 import { CycleReminderConfiguration } from './CycleReminderConfiguration'
 
@@ -9,34 +9,38 @@ export const ControlPanelTabs = () => {
         <Tabs.Trigger value="cycles">Cycle Configuration</Tabs.Trigger>
         <Tabs.Trigger value="reminders">Cycle Reminder Configuration</Tabs.Trigger>
       </Tabs.List>
-      <Tabs.Content
-        inset="0"
-        _open={{
-          animationName: 'fade-in, scale-in',
-          animationDuration: '300ms',
-        }}
-        _closed={{
-          animationName: 'fade-out, scale-out',
-          animationDuration: '120ms',
-        }}
-        value="cycles"
-      >
-        <CycleConfiguration />
-      </Tabs.Content>
-      <Tabs.Content
-        inset="0"
-        _open={{
-          animationName: 'fade-in, scale-in',
-          animationDuration: '300ms',
-        }}
-        _closed={{
-          animationName: 'fade-out, scale-out',
-          animationDuration: '120ms',
-        }}
-        value="reminders"
-      >
-        <CycleReminderConfiguration />
-      </Tabs.Content>
+      <Box position={'relative'} width="full" minH="270px">
+        <Tabs.Content
+          inset="0"
+          position={'absolute'}
+          _open={{
+            animationName: 'fade-in, scale-in',
+            animationDuration: '300ms',
+          }}
+          _closed={{
+            animationName: 'fade-out, scale-out',
+            animationDuration: '120ms',
+          }}
+          value="cycles"
+        >
+          <CycleConfiguration />
+        </Tabs.Content>
+        <Tabs.Content
+          inset="0"
+          position={'absolute'}
+          _open={{
+            animationName: 'fade-in, scale-in',
+            animationDuration: '300ms',
+          }}
+          _closed={{
+            animationName: 'fade-out, scale-out',
+            animationDuration: '120ms',
+          }}
+          value="reminders"
+        >
+          <CycleReminderConfiguration />
+        </Tabs.Content>
+      </Box>
     </Tabs.Root>
   )
 }
