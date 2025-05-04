@@ -2,11 +2,19 @@ import { BackgroundNoise } from '@/types/BackgroundNoise'
 import { Box, Slider } from '@chakra-ui/react'
 import { useRef, useState, useEffect, useCallback, ReactEventHandler } from 'react'
 
-export const BackgroundNoiseElement = ({ sound }: { sound: BackgroundNoise }) => {
+type Props = {
+  sound: BackgroundNoise
+  muted: boolean
+  enlistSound: (slug: string) => void
+  delistSound: (slug: string) => void
+}
+
+export const BackgroundNoiseElement = ({ sound, muted, enlistSound, delistSound }: Props) => {
   const mainAudioRef = useRef<HTMLAudioElement>(null)
   const glueAudioRef = useRef<HTMLAudioElement>(null)
   const [volume, setVolume] = useState(0)
   const [isLoaded, setIsLoaded] = useState(false)
+  const previousVolumeRef = useRef(0)
   const hasStartedLoading = useRef(false)
   const glueShouldPlayRef = useRef(false)
   const isPlayingRef = useRef(false)
@@ -31,11 +39,9 @@ export const BackgroundNoiseElement = ({ sound }: { sound: BackgroundNoise }) =>
 
       main.src = mainSrc
       main.loop = true
-      main.volume = volume
 
       glue.src = glueSrc
       glue.loop = false
-      glue.volume = volume
 
       await Promise.all([waitUntilReady(main), waitUntilReady(glue)])
 
@@ -43,7 +49,32 @@ export const BackgroundNoiseElement = ({ sound }: { sound: BackgroundNoise }) =>
     } catch (err) {
       console.warn('Failed to load audio:', err)
     }
-  }, [sound.slug, volume])
+  }, [sound.slug])
+
+  useEffect(() => {
+    const glue = glueAudioRef.current
+    const main = mainAudioRef.current
+
+    if (!glue || !main) {
+      return
+    }
+
+    if (muted) {
+      setVolume(0)
+      glue.volume = 0
+      main.volume = 0
+      return
+    }
+
+    const previousVolume = previousVolumeRef.current
+
+    setVolume(previousVolume)
+    if (glueShouldPlayRef.current) {
+      glue.volume = previousVolume
+    } else {
+      main.volume = previousVolume
+    }
+  }, [muted])
 
   useEffect(() => {
     if (volume > 0 && !hasStartedLoading.current) {
@@ -113,6 +144,12 @@ export const BackgroundNoiseElement = ({ sound }: { sound: BackgroundNoise }) =>
 
   const handleVolume = (e: { value: number[] }) => {
     const [newVol] = e.value
+    if (newVol > 0.02) {
+      enlistSound(sound.slug)
+    } else {
+      delistSound(sound.slug)
+    }
+    previousVolumeRef.current = volume
     setVolume(newVol)
     if (mainAudioRef.current) mainAudioRef.current.volume = newVol
     if (glueAudioRef.current) glueAudioRef.current.volume = newVol
