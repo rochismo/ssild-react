@@ -43,14 +43,19 @@ export const useForm = <T>(initialValue: T, defaultValues: T) => {
     [form]
   )
 
-  const reset = () => {
+  const reset = useCallback(() => {
     setForm(structuredClone(defaultValues))
-  }
+  }, [defaultValues])
+
+  const reassignInitialValue = useCallback((value: T) => {
+    setForm(value)
+  }, [])
 
   return {
     values: form,
     changeValue,
     reset,
     readValue,
+    reassignInitialValue,
   }
 }

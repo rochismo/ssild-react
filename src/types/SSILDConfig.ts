@@ -11,11 +11,16 @@ export enum SSILDStatus {
   PAUSED,
 }
 
+export type VoiceSettings = {
+  uri: string
+  volume: number
+}
+
 export type SSILDConfig = {
   numberOfCycles: number
   unlimited: boolean
   cycleTimes: SenseConfiguration
   reminderTimes: SenseConfiguration
-  voice: string
+  voice: VoiceSettings
   startDelay: number
 }

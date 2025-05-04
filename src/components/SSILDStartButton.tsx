@@ -4,18 +4,25 @@ import { Button } from '@chakra-ui/react'
 import { useState, useCallback, useMemo, useEffect } from 'react'
 
 export const SSILDStartButton = () => {
-  const { form, start, pause, status } = useSSILDContext()
+  const { form, ssild } = useSSILDContext()
+
   const [countdownSeconds, setCountdownSeconds] = useState<number | null>(null)
 
   const toggle = useCallback(() => {
+    const status = ssild.status
     if (status === SSILDStatus.RUNNING) {
-      return pause()
+      return ssild.pause()
     }
 
-    start()
-  }, [start, status, pause])
+    if (status === SSILDStatus.IDLE) {
+      return ssild.start()
+    }
+
+    return ssild.resume()
+  }, [ssild])
 
   const startSSILDText = useMemo(() => {
+    const status = ssild.status
     if (status === SSILDStatus.IDLE) {
       return 'Start SSILD'
     }
@@ -30,10 +37,10 @@ export const SSILDStartButton = () => {
     }
 
     return 'Pause SSILD'
-  }, [status, countdownSeconds])
+  }, [ssild.status, countdownSeconds])
 
   useEffect(() => {
-    if (status !== SSILDStatus.STARTING || form.values.startDelay <= 0) return
+    if (ssild.status !== SSILDStatus.STARTING || form.values.startDelay <= 0) return
     setCountdownSeconds(() => {
       return form.values.startDelay
     })
@@ -47,10 +54,10 @@ export const SSILDStartButton = () => {
     return () => {
       clearInterval(interval)
     }
-  }, [form, status])
+  }, [form, ssild.status])
 
   return (
-    <Button size="md" onClick={toggle} disabled={status === SSILDStatus.STARTING}>
+    <Button size="md" onClick={toggle} disabled={ssild.status === SSILDStatus.STARTING}>
       {startSSILDText}
     </Button>
   )

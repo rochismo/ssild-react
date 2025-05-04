@@ -13,11 +13,8 @@ import { useSSILDLogic } from '@/hooks/useSSILDLogic'
 type SSILDContextValue = {
   form: ReturnType<typeof useForm<SSILDConfig>>
   voices: SpeechSynthesisVoice[]
-  start: () => void
-  pause: () => void
-  stop: () => void
+  ssild: ReturnType<typeof useSSILDLogic>
   isRunning: boolean
-  status: SSILDStatus
 }
 
 const SSILDContext = createContext<SSILDContextValue | undefined>(undefined)
@@ -35,7 +32,10 @@ const defaultValues: SSILDConfig = {
     sight: DEFAULT_CYCLE_REMINDER_SECONDS,
     touch: DEFAULT_CYCLE_REMINDER_SECONDS,
   },
-  voice: '',
+  voice: {
+    uri: '',
+    volume: 1,
+  },
   startDelay: DEFAULT_START_DELAY,
 }
 
@@ -43,8 +43,8 @@ export const SSILDContextProvider = ({ children }: PropsWithChildren) => {
   const [config, saveConfig] = useLocalStorage<SSILDConfig>('ssild-config', defaultValues)
   const form = useForm<SSILDConfig>(config, defaultValues)
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([])
-  const ssildLogic = useSSILDLogic(form)
-  const isRunning = ssildLogic.status !== SSILDStatus.IDLE
+  const ssild = useSSILDLogic(form)
+  const isRunning = ssild.status !== SSILDStatus.IDLE
 
   useEffect(() => {
     speechSynthesis.onvoiceschanged = () => {
@@ -55,15 +55,22 @@ export const SSILDContextProvider = ({ children }: PropsWithChildren) => {
   }, [])
 
   useEffect(() => {
-    saveConfig(form.values)
-  }, [form, saveConfig])
+    // Use JSON comparison to detect real changes
+    const stored = localStorage.getItem('ssild-config')
+    const parsed = stored ? JSON.parse(stored) : null
+    const current = form.values
+
+    if (JSON.stringify(parsed) !== JSON.stringify(current)) {
+      saveConfig(current)
+    }
+  }, [form.values, saveConfig])
 
   return (
     <SSILDContext.Provider
       value={{
         form,
         voices,
-        ...ssildLogic,
+        ssild,
         isRunning,
       }}
     >

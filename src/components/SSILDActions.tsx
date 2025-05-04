@@ -4,7 +4,7 @@ import { Flex, Button } from '@chakra-ui/react'
 import { SSILDStartButton } from './SSILDStartButton'
 
 export const SSILDActions = () => {
-  const { form, stop, status } = useSSILDContext()
+  const { form, ssild } = useSSILDContext()
 
   return (
     <Flex
@@ -13,14 +13,14 @@ export const SSILDActions = () => {
       gap={{ base: '0', smTo2xl: '5', '2xlOnly': '5' }}
     >
       <SSILDStartButton />
-      {status === SSILDStatus.IDLE && (
+      {ssild.status === SSILDStatus.IDLE && (
         <Button size="md" onClick={() => form.reset()}>
           Reset Settings
         </Button>
       )}
 
-      {status !== SSILDStatus.IDLE && (
-        <Button size="md" onClick={stop}>
+      {ssild.status !== SSILDStatus.IDLE && (
+        <Button size="md" onClick={ssild.stop}>
           Stop SSILD
         </Button>
       )}

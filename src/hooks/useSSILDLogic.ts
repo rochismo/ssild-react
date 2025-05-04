@@ -15,6 +15,7 @@ export const useSSILDLogic = (form: ReturnType<typeof useForm<SSILDConfig>>) => 
   useEffect(() => {
     statusRef.current = status
   }, [status])
+
   const isPaused = useCallback(() => {
     return statusRef.current === SSILDStatus.PAUSED
   }, [])
@@ -24,14 +25,14 @@ export const useSSILDLogic = (form: ReturnType<typeof useForm<SSILDConfig>>) => 
   }, [])
 
   const waitWithPause = useCallback(
-    async (seconds: number) => {
+    async (seconds: number, signal: AbortSignal) => {
       const start = Date.now()
       while (Date.now() - start < seconds * 1000) {
         if (isStopped()) return false
-        await sleep(0.1)
+        await sleep(0.1, signal)
       }
 
-      while (isPaused()) await sleep(0.1)
+      while (isPaused()) await sleep(0.1, signal)
       if (isStopped()) return false
       return true
     },
@@ -45,13 +46,12 @@ export const useSSILDLogic = (form: ReturnType<typeof useForm<SSILDConfig>>) => 
     // This function gets called upon resuming SSILD.
     // It must not be executed unless the status was IDLE
     if (!isStopped()) return
+    const controller = new AbortController()
+    abortControllerRef.current = controller
 
     const config = form.values
     if (config.startDelay !== 0) {
       setStatus(SSILDStatus.STARTING)
-
-      const controller = new AbortController()
-      abortControllerRef.current = controller
 
       try {
         await sleep(config.startDelay, abortControllerRef.current.signal)
@@ -82,15 +82,18 @@ export const useSSILDLogic = (form: ReturnType<typeof useForm<SSILDConfig>>) => 
           let reminderInterval: ReturnType<typeof setInterval> | null = null
           if (senseReminderTime > 0 && senseReminderTime < senseTime) {
             // Repeat the current sense as configured
-            reminderInterval = setInterval(() => {
+            reminderInterval = setInterval(async () => {
               if (!isPaused() && !isStopped()) {
                 speak(sense, config.voice)
               }
             }, senseReminderTime * 1000)
           }
 
-          const wasStopped = await waitWithPause(senseTime)
-          if (reminderInterval) clearInterval(reminderInterval)
+          const wasStopped = await waitWithPause(senseTime, abortControllerRef.current.signal)
+            .catch(() => {}) // Swallow the error
+            .finally(() => {
+              if (reminderInterval) clearInterval(reminderInterval)
+            })
           if (!wasStopped) return
         }
       }
@@ -99,15 +102,21 @@ export const useSSILDLogic = (form: ReturnType<typeof useForm<SSILDConfig>>) => 
     setStatus(SSILDStatus.IDLE)
   }, [form, isPaused, isStopped, waitWithPause])
 
+  const resume = useCallback(() => {
+    setStatus(SSILDStatus.RUNNING)
+    statusRef.current = SSILDStatus.RUNNING
+  }, [])
+
   const pause = useCallback(() => {
     setStatus(SSILDStatus.PAUSED)
     statusRef.current = SSILDStatus.PAUSED
   }, [])
 
   const stop = useCallback(() => {
+    abortControllerRef.current?.abort()
     setStatus(SSILDStatus.IDLE)
     statusRef.current = SSILDStatus.IDLE
   }, [])
 
-  return { start, pause, stop, status }
+  return { start, pause, stop, resume, status }
 }
