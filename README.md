@@ -1,4 +1,18 @@
-# React + TypeScript + Vite
+# SSILD Trainer
+
+This is a SSILD (Senses Initiated Lucid Dream) training web app designed to help you practice the SSILD cycles.
+
+- [Try it here](https://rochismo.github.io/ssild-react/).
+
+## What is SSILD?
+
+SSILD (Senses Initiated Lucid Dreaming) is a lucid dreaming technique that involves cycling through your senses; sight, sound, and touch - in a specific pattern to prime your mind for awareness during dreams.
+
+The core idea is to gently train your perception without straining, helping you enter a state of heightened awareness that can trigger lucidity in dreams.
+
+For more details, visit [https://www.reddit.com/r/SSILD/](r/SSILD).
+
+## React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
