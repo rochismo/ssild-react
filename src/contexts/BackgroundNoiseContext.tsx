@@ -20,7 +20,9 @@ export const BackgroundNoiseContextProvider = ({ children }: PropsWithChildren) 
   const [soundsPlaying, enlistSound, delistSound] = useMutableSet<string>()
 
   const muteAllSounds = useCallback(() => {
-    backgroundNoises.forEach((bg) => muteSound(bg.slug))
+    backgroundNoises.forEach((bg) => {
+      muteSound(bg.slug)
+    })
   }, [muteSound])
 
   const unmuteAllSounds = useCallback(() => {

@@ -1,5 +1,4 @@
 import { useBackgroundNoiseContext } from '@/contexts/BackgroundNoiseContext'
-import { useMuteEffect } from '@/hooks/useMuteEffect'
 import { BackgroundNoise } from '@/types/BackgroundNoise'
 import { Box, Button, Flex, Slider } from '@chakra-ui/react'
 import { useRef, useState, useEffect, useCallback, ReactEventHandler } from 'react'
@@ -19,8 +18,7 @@ export const BackgroundNoiseElement = ({ sound }: Props) => {
   const glueShouldPlayRef = useRef(false)
   const isPlayingRef = useRef(false)
   const muted = mutedSounds.has(sound.slug)
-
-  useMuteEffect({ muted, currentVolume: volume, glueAudioRef, glueShouldPlayRef, mainAudioRef })
+  const volumeRef = useRef(0)
 
   const loadAudioSources = useCallback(async () => {
     try {
@@ -88,6 +86,7 @@ export const BackgroundNoiseElement = ({ sound }: Props) => {
     const currentTime = mainAudio.currentTime
     const glueDuration = glueAudioRef.current?.duration ?? 0
     const glueShouldPlay = glueShouldPlayRef.current
+    mainAudio.volume = volume
 
     // If glue is not playing and main is nearing end (within half of glue's duration), play glue
     if (!glueShouldPlay && currentTime > duration - glueDuration / 2) {
@@ -103,6 +102,7 @@ export const BackgroundNoiseElement = ({ sound }: Props) => {
   const handleGluePlaying: ReactEventHandler<HTMLAudioElement> = (e) => {
     const glueAudio = e.target as HTMLAudioElement
     const duration = glueAudio.duration
+    glueAudio.volume = volume
 
     // If the glue audio is more than halfway through, resume main playback and disable glue
     if (glueAudio.currentTime > duration / 2) {
@@ -110,6 +110,32 @@ export const BackgroundNoiseElement = ({ sound }: Props) => {
       glueShouldPlayRef.current = false
     }
   }
+  // useMuteEffect({ muted, setVolume, volumeRef, glueAudioRef, mainAudioRef, glueShouldPlayRef })
+
+  useEffect(() => {
+    const glue = glueAudioRef.current
+    const main = mainAudioRef.current
+
+    if (!glue || !main) {
+      return
+    }
+
+    if (muted) {
+      setVolume(0)
+      glue.volume = 0
+      main.volume = 0
+      return
+    }
+
+    const previousVolume = volumeRef.current
+
+    setVolume(previousVolume)
+    if (glueShouldPlayRef.current) {
+      glue.volume = previousVolume
+    } else {
+      main.volume = previousVolume
+    }
+  }, [muted])
 
   useEffect(() => {
     if (!isLoaded) return
@@ -122,6 +148,7 @@ export const BackgroundNoiseElement = ({ sound }: Props) => {
 
   const handleVolume = useCallback(
     (e: { value: number[] }) => {
+      volumeRef.current = volume
       const [newVol] = e.value
       if (newVol > 0.02) {
         enlistSound(sound.slug)
@@ -134,12 +161,13 @@ export const BackgroundNoiseElement = ({ sound }: Props) => {
       if (mainAudioRef.current) mainAudioRef.current.volume = newVol
       if (glueAudioRef.current) glueAudioRef.current.volume = newVol
     },
-    [delistSound, enlistSound, muted, sound.slug, unmuteSound]
+    [delistSound, enlistSound, muted, sound.slug, unmuteSound, volume]
   )
 
   const toggleMute = useCallback(() => {
     if (!muted && volume !== 0) {
       muteSound(sound.slug)
+      delistSound(sound.slug)
       return
     }
 
@@ -149,7 +177,8 @@ export const BackgroundNoiseElement = ({ sound }: Props) => {
     if (mutedSounds.has(sound.slug)) {
       unmuteSound(sound.slug)
     }
-  }, [handleVolume, muteSound, muted, mutedSounds, sound.slug, unmuteSound, volume])
+    enlistSound(sound.slug)
+  }, [delistSound, enlistSound, handleVolume, muteSound, muted, mutedSounds, sound.slug, unmuteSound, volume])
 
   return (
     <Box w={'80%'}>

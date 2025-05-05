@@ -36,6 +36,9 @@ export const useSSILDLogic = (form: ReturnType<typeof useForm<SSILDConfig>>) => 
 
     stop()
 
+    ssildManager.abort()
+    speechSynthesis.cancel()
+
     if (config.muteBackgroundSoundsUponStop) {
       muteAllSounds()
     }
