@@ -1,3 +1,4 @@
+import { useMuteEffect } from '@/hooks/useMuteEffect'
 import { BackgroundNoise } from '@/types/BackgroundNoise'
 import { Box, Slider } from '@chakra-ui/react'
 import { useRef, useState, useEffect, useCallback, ReactEventHandler } from 'react'
@@ -14,10 +15,11 @@ export const BackgroundNoiseElement = ({ sound, muted, enlistSound, delistSound 
   const glueAudioRef = useRef<HTMLAudioElement>(null)
   const [volume, setVolume] = useState(0)
   const [isLoaded, setIsLoaded] = useState(false)
-  const previousVolumeRef = useRef(0)
   const hasStartedLoading = useRef(false)
   const glueShouldPlayRef = useRef(false)
   const isPlayingRef = useRef(false)
+
+  useMuteEffect({ muted, currentVolume: volume, glueAudioRef, glueShouldPlayRef, mainAudioRef })
 
   const loadAudioSources = useCallback(async () => {
     try {
@@ -50,31 +52,6 @@ export const BackgroundNoiseElement = ({ sound, muted, enlistSound, delistSound 
       console.warn('Failed to load audio:', err)
     }
   }, [sound.slug])
-
-  useEffect(() => {
-    const glue = glueAudioRef.current
-    const main = mainAudioRef.current
-
-    if (!glue || !main) {
-      return
-    }
-
-    if (muted) {
-      setVolume(0)
-      glue.volume = 0
-      main.volume = 0
-      return
-    }
-
-    const previousVolume = previousVolumeRef.current
-
-    setVolume(previousVolume)
-    if (glueShouldPlayRef.current) {
-      glue.volume = previousVolume
-    } else {
-      main.volume = previousVolume
-    }
-  }, [muted])
 
   useEffect(() => {
     if (volume > 0 && !hasStartedLoading.current) {
@@ -149,7 +126,6 @@ export const BackgroundNoiseElement = ({ sound, muted, enlistSound, delistSound 
     } else {
       delistSound(sound.slug)
     }
-    previousVolumeRef.current = volume
     setVolume(newVol)
     if (mainAudioRef.current) mainAudioRef.current.volume = newVol
     if (glueAudioRef.current) glueAudioRef.current.volume = newVol
@@ -157,7 +133,7 @@ export const BackgroundNoiseElement = ({ sound, muted, enlistSound, delistSound 
 
   return (
     <Box w={'60%'}>
-      <Slider.Root value={[volume]} min={0} max={1} step={0.01} onValueChange={handleVolume}>
+      <Slider.Root value={[volume]} disabled={muted} min={0} max={1} step={0.01} onValueChange={handleVolume}>
         <Slider.Label>{sound.displayName}</Slider.Label>
         <Slider.Control>
           <Slider.Track bg={sound.slider.trackBg}>
