@@ -15,7 +15,7 @@ export function setDeepValue<T>(obj: T, path: string, value: any): T {
 }
 
 export function readDeepValue<T, K extends Path<T>>(obj: T, path: K): PathValue<T, K> {
-  const keys = path.split('.')
+  const keys = (path as string).split('.')
   let current: any = obj
 
   for (const key of keys) {

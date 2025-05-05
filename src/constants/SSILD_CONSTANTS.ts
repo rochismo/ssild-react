@@ -7,3 +7,4 @@ export const MIN_SENSE_SECONDS = 5
 export const MAX_SENSE_SECONDS = 100
 export const DEFAULT_START_DELAY = 0
 export const MAX_START_DELAY = 50
+export const SENSES = ['sight', 'hearing', 'touch'] as const
