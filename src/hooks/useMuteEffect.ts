@@ -1,3 +1,4 @@
+import { useBackgroundNoiseContext } from '@/contexts/BackgroundNoiseContext'
 import { useEffect, useRef } from 'react'
 
 type AudioRef = React.RefObject<HTMLAudioElement | null>
@@ -34,10 +35,10 @@ const fadeAudio = (
 }
 
 type UseMuteEffectProps = {
-  muted: boolean
   currentVolume: number
   glueAudioRef: AudioRef
   mainAudioRef: AudioRef
+  muted: boolean
   glueShouldPlayRef: React.RefObject<boolean>
 }
 
@@ -49,7 +50,6 @@ export const useMuteEffect = ({
   glueShouldPlayRef,
 }: UseMuteEffectProps) => {
   const fadeIntervalRef = useRef<number | null>(null)
-
   useEffect(() => {
     const glue = glueAudioRef.current
     const main = mainAudioRef.current

@@ -37,6 +37,7 @@ const defaultValues: SSILDConfig = {
     volume: 1,
   },
   startDelay: DEFAULT_START_DELAY,
+  muteBackgroundSoundsUponStop: false,
 }
 
 export const SSILDContextProvider = ({ children }: PropsWithChildren) => {

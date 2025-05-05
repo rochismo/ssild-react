@@ -1,16 +1,16 @@
+import { useBackgroundNoiseContext } from '@/contexts/BackgroundNoiseContext'
 import { useMuteEffect } from '@/hooks/useMuteEffect'
 import { BackgroundNoise } from '@/types/BackgroundNoise'
-import { Box, Slider } from '@chakra-ui/react'
+import { Box, Button, Flex, Slider } from '@chakra-ui/react'
 import { useRef, useState, useEffect, useCallback, ReactEventHandler } from 'react'
+import { GoMute, GoUnmute } from 'react-icons/go'
 
 type Props = {
   sound: BackgroundNoise
-  muted: boolean
-  enlistSound: (slug: string) => void
-  delistSound: (slug: string) => void
 }
 
-export const BackgroundNoiseElement = ({ sound, muted, enlistSound, delistSound }: Props) => {
+export const BackgroundNoiseElement = ({ sound }: Props) => {
+  const { enlistSound, delistSound, mutedSounds, muteSound, unmuteSound } = useBackgroundNoiseContext()
   const mainAudioRef = useRef<HTMLAudioElement>(null)
   const glueAudioRef = useRef<HTMLAudioElement>(null)
   const [volume, setVolume] = useState(0)
@@ -18,7 +18,7 @@ export const BackgroundNoiseElement = ({ sound, muted, enlistSound, delistSound 
   const hasStartedLoading = useRef(false)
   const glueShouldPlayRef = useRef(false)
   const isPlayingRef = useRef(false)
-
+  const muted = mutedSounds.has(sound.slug)
   useMuteEffect({ muted, currentVolume: volume, glueAudioRef, glueShouldPlayRef, mainAudioRef })
 
   const loadAudioSources = useCallback(async () => {
@@ -127,23 +127,43 @@ export const BackgroundNoiseElement = ({ sound, muted, enlistSound, delistSound 
       delistSound(sound.slug)
     }
     setVolume(newVol)
+
+    if (muted) return
     if (mainAudioRef.current) mainAudioRef.current.volume = newVol
     if (glueAudioRef.current) glueAudioRef.current.volume = newVol
   }
 
+  const toggleMute = useCallback(() => {
+    if (muted) {
+      return unmuteSound(sound.slug)
+    }
+    muteSound(sound.slug)
+  }, [muteSound, muted, sound.slug, unmuteSound])
+
   return (
     <Box w={'60%'}>
-      <Slider.Root value={[volume]} disabled={muted} min={0} max={1} step={0.01} onValueChange={handleVolume}>
-        <Slider.Label>{sound.displayName}</Slider.Label>
-        <Slider.Control>
-          <Slider.Track bg={sound.slider.trackBg}>
-            <Slider.Range bg={sound.slider.trackRangeBg} />
-          </Slider.Track>
-          <Slider.Thumb index={0} boxSize={6} borderColor={sound.slider.thumbBg} shadow="md">
-            <Box as={sound.slider.thumbIcon} />
-          </Slider.Thumb>
-        </Slider.Control>
-      </Slider.Root>
+      <Flex gap="5">
+        <Button
+          rounded={'full'}
+          alignSelf={'flex-end'}
+          size={'2xs'}
+          bgColor={sound.slider.thumbBg}
+          onClick={toggleMute}
+        >
+          {muted ? <GoUnmute /> : <GoMute />}
+        </Button>
+        <Slider.Root w="100%" value={[volume]} min={0} max={1} step={0.01} onValueChange={handleVolume}>
+          <Slider.Label>{sound.displayName}</Slider.Label>
+          <Slider.Control>
+            <Slider.Track bg={sound.slider.trackBg}>
+              <Slider.Range bg={sound.slider.trackRangeBg} />
+            </Slider.Track>
+            <Slider.Thumb index={0} boxSize={6} borderColor={sound.slider.thumbBg} shadow="md">
+              <Box as={sound.slider.thumbIcon} />
+            </Slider.Thumb>
+          </Slider.Control>
+        </Slider.Root>
+      </Flex>
       <audio ref={mainAudioRef} preload="auto" onTimeUpdate={handleMainPlaying} />
       <audio ref={glueAudioRef} preload="auto" onTimeUpdate={handleGluePlaying} />
     </Box>

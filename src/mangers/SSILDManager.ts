@@ -25,22 +25,27 @@ export class SSILDManager {
   }
 
   public async waitForStart() {
-    this._abortController?.abort()
-    this._abortController = new AbortController()
+    try {
+      this._abortController?.abort()
+      this._abortController = new AbortController()
 
-    if (this.config.startDelay <= 0) {
-      return
+      if (this.config.startDelay <= 0) {
+        return true
+      }
+      this.statusManager.changeStatus(SSILDStatus.STARTING)
+
+      await pauseAwareSleep(
+        this.config.startDelay,
+        this._abortController?.signal,
+        () => this.statusManager.isPaused,
+        () => this.statusManager.isStopped
+      )
+
+      await this.waitIfPausedOrThrowIfStopped()
+      return true
+    } catch {
+      return false
     }
-    this.statusManager.changeStatus(SSILDStatus.STARTING)
-
-    await pauseAwareSleep(
-      this.config.startDelay,
-      this._abortController?.signal,
-      () => this.statusManager.isPaused,
-      () => this.statusManager.isStopped
-    ).catch(() => {})
-
-    await this.waitIfPausedOrThrowIfStopped().catch(() => {})
   }
 
   public async start() {

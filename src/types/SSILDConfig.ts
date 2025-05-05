@@ -23,4 +23,5 @@ export type SSILDConfig = {
   reminderTimes: SenseConfiguration
   voice: VoiceSettings
   startDelay: number
+  muteBackgroundSoundsUponStop: boolean
 }
