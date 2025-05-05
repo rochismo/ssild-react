@@ -1,4 +1,3 @@
-import { useBackgroundNoiseContext } from '@/contexts/BackgroundNoiseContext'
 import { useEffect, useRef } from 'react'
 
 type AudioRef = React.RefObject<HTMLAudioElement | null>

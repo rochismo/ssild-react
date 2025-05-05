@@ -19,6 +19,7 @@ export const BackgroundNoiseElement = ({ sound }: Props) => {
   const glueShouldPlayRef = useRef(false)
   const isPlayingRef = useRef(false)
   const muted = mutedSounds.has(sound.slug)
+
   useMuteEffect({ muted, currentVolume: volume, glueAudioRef, glueShouldPlayRef, mainAudioRef })
 
   const loadAudioSources = useCallback(async () => {
@@ -119,32 +120,43 @@ export const BackgroundNoiseElement = ({ sound }: Props) => {
     }
   }, [isLoaded, volume])
 
-  const handleVolume = (e: { value: number[] }) => {
-    const [newVol] = e.value
-    if (newVol > 0.02) {
-      enlistSound(sound.slug)
-    } else {
-      delistSound(sound.slug)
-    }
-    setVolume(newVol)
+  const handleVolume = useCallback(
+    (e: { value: number[] }) => {
+      const [newVol] = e.value
+      if (newVol > 0.02) {
+        enlistSound(sound.slug)
+      } else {
+        delistSound(sound.slug)
+      }
+      setVolume(newVol)
 
-    if (muted) return
-    if (mainAudioRef.current) mainAudioRef.current.volume = newVol
-    if (glueAudioRef.current) glueAudioRef.current.volume = newVol
-  }
+      if (muted) unmuteSound(sound.slug)
+      if (mainAudioRef.current) mainAudioRef.current.volume = newVol
+      if (glueAudioRef.current) glueAudioRef.current.volume = newVol
+    },
+    [delistSound, enlistSound, muted, sound.slug, unmuteSound]
+  )
 
   const toggleMute = useCallback(() => {
-    if (muted) {
-      return unmuteSound(sound.slug)
+    if (!muted && volume !== 0) {
+      muteSound(sound.slug)
+      return
     }
-    muteSound(sound.slug)
-  }, [muteSound, muted, sound.slug, unmuteSound])
+
+    if (volume === 0) {
+      handleVolume({ value: [0.2] })
+    }
+    if (mutedSounds.has(sound.slug)) {
+      unmuteSound(sound.slug)
+    }
+  }, [handleVolume, muteSound, muted, mutedSounds, sound.slug, unmuteSound, volume])
 
   return (
-    <Box w={'60%'}>
-      <Flex gap="5">
+    <Box w={'80%'}>
+      <Flex gap="2">
         <Button
           rounded={'full'}
+          mt="5"
           alignSelf={'flex-end'}
           size={'2xs'}
           bgColor={sound.slider.thumbBg}
