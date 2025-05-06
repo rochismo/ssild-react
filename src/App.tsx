@@ -21,7 +21,15 @@ function App() {
   }
 
   return (
-    <Flex minH="100vh" align={{ base: 'center' }} direction={'column'} gap="2" justify="center" p={4}>
+    <Flex
+      overflowY="hidden"
+      minH="100vh"
+      align={{ base: 'center' }}
+      direction={'column'}
+      gap="2"
+      justify="center"
+      p={4}
+    >
       <Tabs.Root defaultValue="control-panel" variant={'subtle'} fitted>
         <Tabs.List alignContent={'center'} width="100%" justifyContent={'center'}>
           <Tabs.Trigger value="control-panel">SSILD Control Panel</Tabs.Trigger>
