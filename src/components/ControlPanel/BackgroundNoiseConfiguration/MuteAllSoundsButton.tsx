@@ -1,10 +1,10 @@
 import { useBackgroundNoiseContext } from '@/contexts/BackgroundNoiseContext'
 import { backgroundNoises } from '@/definitions/background-noise.definitions'
-import { Button } from '@chakra-ui/react'
-import { useEffect, useCallback } from 'react'
+import { Button, ButtonProps } from '@chakra-ui/react'
+import { useEffect, useCallback, RefAttributes } from 'react'
 import { GoMute, GoUnmute } from 'react-icons/go'
 
-export const MuteAllSoundsButton = () => {
+export const MuteAllSoundsButton = (props: ButtonProps & RefAttributes<HTMLButtonElement> = {}) => {
   const { mutedSounds, soundsPlaying, unmuteAllSounds, muteAllSounds } = useBackgroundNoiseContext()
   const areAllSoundsMuted = mutedSounds.size === backgroundNoises.length
 
@@ -22,7 +22,7 @@ export const MuteAllSoundsButton = () => {
     muteAllSounds()
   }, [mutedSounds, muteAllSounds, unmuteAllSounds])
   return (
-    <Button disabled={soundsPlaying.size <= 0} onClick={toggleAllSounds} mb={4}>
+    <Button disabled={soundsPlaying.size <= 0} onClick={toggleAllSounds} mb={4} {...props}>
       {areAllSoundsMuted ? <GoUnmute /> : <GoMute />}
       {areAllSoundsMuted ? 'Resume All Sounds' : 'Mute All Sounds'}
     </Button>

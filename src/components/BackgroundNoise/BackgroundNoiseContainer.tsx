@@ -6,7 +6,7 @@ import { MuteAllSoundsButton } from '../ControlPanel/BackgroundNoiseConfiguratio
 export const BackgroundNoiseContainer = () => {
   return (
     <Flex direction="column" height="100%" py={5}>
-      <MuteAllSoundsButton />
+      <MuteAllSoundsButton alignSelf={'center'} />
 
       <Flex wrap="wrap" gap="10" overflowY="auto" justifyContent="center" flex="1">
         {backgroundNoises.map((sound) => {
