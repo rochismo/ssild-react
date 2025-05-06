@@ -9,12 +9,14 @@ import {
   DEFAULT_MAX_CYCLES,
 } from '@/constants/SSILD_CONSTANTS'
 import { useSSILDLogic } from '@/hooks/useSSILDLogic'
+import { useSSILDStatsTracker } from '@/hooks/useSSILDStatsTracker'
 
 type SSILDContextValue = {
   form: ReturnType<typeof useForm<SSILDConfig>>
   voices: SpeechSynthesisVoice[]
   ssild: ReturnType<typeof useSSILDLogic>
   isRunning: boolean
+  tracking: ReturnType<typeof useSSILDStatsTracker>
 }
 
 const SSILDContext = createContext<SSILDContextValue | undefined>(undefined)
@@ -44,7 +46,9 @@ export const SSILDContextProvider = ({ children }: PropsWithChildren) => {
   const [config, saveConfig] = useLocalStorage<SSILDConfig>('ssild-config', defaultValues)
   const form = useForm<SSILDConfig>(config, defaultValues)
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([])
-  const ssild = useSSILDLogic(form)
+  const tracking = useSSILDStatsTracker()
+  const ssild = useSSILDLogic(form, tracking)
+
   const isRunning = ssild.status !== SSILDStatus.IDLE
 
   useEffect(() => {
@@ -73,6 +77,7 @@ export const SSILDContextProvider = ({ children }: PropsWithChildren) => {
         voices,
         ssild,
         isRunning,
+        tracking,
       }}
     >
       {children}

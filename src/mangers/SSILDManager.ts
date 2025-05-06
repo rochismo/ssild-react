@@ -12,6 +12,8 @@ export class SSILDManager {
   private _statusManager: SSILDStatusManager | null = null
   private _config: SSILDConfig | null = null
 
+  public onCycleCompleted: (() => void) | null = null
+
   constructor(statusManager: SSILDStatusManager) {
     this._statusManager = statusManager
   }
@@ -73,23 +75,22 @@ export class SSILDManager {
 
           await this.waitIfPausedOrThrowIfStopped()
         }
+
+        this.onCycleCompleted?.()
       }
     } while (this.config.unlimited)
   }
 
   private async processSense(sense: Senses) {
-    // Give it a small delay to make it seem a bit more natural
-    await sleep(0.7)
-
     speechSynthesis.cancel()
 
     this.clearTimeout()
 
     const senseTime = this.config.cycleTimes[sense]
 
-    await speak(sense, this.config.voice)
-
-    this.configureReminder(sense, senseTime)
+    speak(sense, this.config.voice).then(() => {
+      this.configureReminder(sense, senseTime)
+    })
 
     await pauseAwareSleep(
       senseTime,

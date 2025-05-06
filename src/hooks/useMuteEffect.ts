@@ -42,7 +42,6 @@ function fadeAudio(
       audio.volume = currentVolume
 
       if (currentStep >= steps) {
-        console.log('Oh hello', direction)
         audio.volume = endVolume
         clearInterval(fadeInterval)
         resolve()

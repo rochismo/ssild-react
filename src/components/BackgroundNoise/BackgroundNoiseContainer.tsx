@@ -9,7 +9,7 @@ export const BackgroundNoiseContainer = () => {
   const { mutedSounds, soundsPlaying, unmuteAllSounds, muteAllSounds } = useBackgroundNoiseContext()
   const { form, isRunning } = useSSILDContext()
   const areAllSoundsMuted = mutedSounds.size === backgroundNoises.length
-  console.log(soundsPlaying)
+
   useEffect(() => {
     if (soundsPlaying.size == 0 && mutedSounds.size > 0) {
       unmuteAllSounds()

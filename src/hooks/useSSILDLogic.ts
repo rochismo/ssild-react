@@ -3,8 +3,12 @@ import { useCallback, useState } from 'react'
 import { useForm } from './useForm'
 import { ssildManager, ssildStatusManager } from '@/mangers/instances'
 import { useBackgroundNoiseContext } from '@/contexts/BackgroundNoiseContext'
+import { useSSILDStatsTracker } from './useSSILDStatsTracker'
 
-export const useSSILDLogic = (form: ReturnType<typeof useForm<SSILDConfig>>) => {
+export const useSSILDLogic = (
+  form: ReturnType<typeof useForm<SSILDConfig>>,
+  tracking: ReturnType<typeof useSSILDStatsTracker>
+) => {
   const { muteAllSounds, unmuteAllSounds } = useBackgroundNoiseContext()
   const [status, setStatus] = useState(SSILDStatus.IDLE)
 
@@ -12,11 +16,13 @@ export const useSSILDLogic = (form: ReturnType<typeof useForm<SSILDConfig>>) => 
     ssildManager.abort()
     setStatus(SSILDStatus.IDLE)
     ssildStatusManager.changeStatus(SSILDStatus.IDLE)
-  }, [])
+    tracking.stopTrackingSeconds()
+  }, [tracking])
 
   const start = useCallback(async () => {
     const config = form.values
     ssildManager.initialize(config)
+    tracking.clearStats()
 
     if (config.startDelay > 0) {
       setStatus(SSILDStatus.STARTING)
@@ -32,6 +38,9 @@ export const useSSILDLogic = (form: ReturnType<typeof useForm<SSILDConfig>>) => 
     }
 
     setStatus(SSILDStatus.RUNNING)
+
+    tracking.stopTrackingSeconds()
+    tracking.setupTrackers()
     await ssildManager.start()
 
     stop()
@@ -42,17 +51,20 @@ export const useSSILDLogic = (form: ReturnType<typeof useForm<SSILDConfig>>) => 
     if (config.muteBackgroundSoundsUponStop) {
       muteAllSounds()
     }
-  }, [form.values, stop, muteAllSounds, unmuteAllSounds])
+    tracking.stopTrackingSeconds()
+  }, [form.values, stop, muteAllSounds, unmuteAllSounds, tracking])
 
   const resume = useCallback(() => {
     setStatus(SSILDStatus.RUNNING)
     ssildStatusManager.changeStatus(SSILDStatus.RUNNING)
-  }, [])
+    tracking.beginTrackingSeconds()
+  }, [tracking])
 
   const pause = useCallback(() => {
     setStatus(SSILDStatus.PAUSED)
     ssildStatusManager.changeStatus(SSILDStatus.PAUSED)
-  }, [])
+    tracking.stopTrackingSeconds()
+  }, [tracking])
 
   return { start, pause, stop, resume, status }
 }
