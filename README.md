@@ -10,7 +10,7 @@ SSILD (Senses Initiated Lucid Dreaming) is a lucid dreaming technique that invol
 
 The core idea is to gently train your perception without straining, helping you enter a state of heightened awareness that can trigger lucidity in dreams.
 
-For more details, visit [https://www.reddit.com/r/SSILD/](r/SSILD).
+For more details, visit [r/SSILD](https://www.reddit.com/r/SSILD/).
 
 ## React + TypeScript + Vite
 
